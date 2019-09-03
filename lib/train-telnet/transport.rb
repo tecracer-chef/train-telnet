@@ -17,7 +17,7 @@ module TrainPlugins
       option :setup,           default: ""
       option :teardown,        default: ""
       option :error_pattern,   default: "ERROR: .*$"
-      option :prompt_pattern,  default: "[-a-zA-Z0-9]+(?:\((?:config|config-[a-z]+|vlan)\))?[#>]\s*$"
+      option :prompt_pattern,  default: '(?:[-a-zA-Z0-9]+(?:\((?:config|config-[a-z]+|vlan)\))?[#>]\s*|\[\S+\]:\s*)$'
 
       # Non documented options for development
       option :debug_telnet,   default: false

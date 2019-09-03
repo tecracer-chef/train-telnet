@@ -40,6 +40,7 @@ module TrainPlugins
         end
 
         stdout = session.cmd(cmd)
+
         stderr = ""
         exit_status = 0
 
@@ -47,7 +48,7 @@ module TrainPlugins
         session.waitfor("Waittime" => 0.1, "Match" => /./, "Timeout" => 0.1) rescue Net::ReadTimeout
 
         # Remove \r in linebreaks
-        stdout.delete!("\r")
+        stdout&.delete!("\r")
 
         if @options[:debug_telnet]
           logger.debug "[Telnet] <= '#{stdout}'"
@@ -55,18 +56,18 @@ module TrainPlugins
 
         # Extract command output only (no leading/trailing prompts)
         unless @options[:raw_output]
-          stdout = stdout.match(/#{Regexp.quote(cmd.strip)}\n(.*?)\n#{@options[:prompt_pattern]}/m)&.captures&.first
+          stdout = stdout&.match(/#{Regexp.quote(cmd.strip)}\n(.*?)\n#{@options[:prompt_pattern]}/m)&.captures&.first
         end
-        stdout = "" if stdout.nil?
 
         # Simulate exit code and stderr
-        errors = stdout.match(/^(#{@options[:error_pattern]})/)
+        errors = stdout&.match(/^(#{@options[:error_pattern]})/)
         if errors
           exit_status = 1
           stderr = errors.captures.first
-          stdout.gsub!(/^#{@options[:error_pattern]}/, "")
+          stdout&.gsub!(/^#{@options[:error_pattern]}/, "")
         end
 
+        stdout = "" if stdout.nil?
         [exit_status, stdout, stderr]
       end
 
